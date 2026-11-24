@@ -18,12 +18,19 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Install PHP deps first (better layer caching)
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Install PHP deps first (better layer caching).
+# --no-scripts karena file `artisan` belum ada di layer ini;
+# script post-autoload-dump dijalankan belakangan via dump-autoload.
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
 # App source
 COPY . .
+
+# Baru di sini artisan tersedia -> generate optimized autoload + package discovery
+RUN composer dump-autoload --optimize --no-dev --no-interaction
 
 # Apache document root -> Laravel public
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
