@@ -10,6 +10,19 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Middleware\EnsureAdmin;
 use Illuminate\Support\Facades\Route;
 
+// Health check milik sendiri (untuk Render healthCheckPath).
+// Sengaja tanpa DB/session/cookies agar tidak bisa 500 karena env lain.
+// Hanya mengembalikan flag boolean (tanpa membocorkan nilai secret).
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'app_key_set' => !empty(config('app.key')),
+        'mongodb_uri_set' => !empty(config('database.connections.mongodb.dsn')),
+        'db_database' => config('database.connections.mongodb.database'),
+        'time' => now()->toIso8601String(),
+    ]);
+});
+
 Route::prefix('v1')->group(function () {
     // -------------------------------------------------------------
     // Public Routes
