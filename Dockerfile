@@ -24,7 +24,13 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # --no-scripts karena file `artisan` belum ada di layer ini;
 # script post-autoload-dump dijalankan belakangan via dump-autoload.
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+# Retry hingga 3x: download dist dari GitHub kadang 504 sesaat (transient)
+RUN success=0; \
+    for i in 1 2 3; do \
+      if composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts; then success=1; break; fi; \
+      echo "composer install attempt $i failed, retrying..."; sleep 15; \
+    done; \
+    test "$success" = "1"
 
 # App source
 COPY . .
