@@ -1,0 +1,257 @@
+{
+  "info": {
+    "name": "RigCraft API v1",
+    "description": "Koleksi endpoint backend RigCraft (Laravel + MongoDB + JWT). Isi {{baseUrl}} dan {{token}} di environment. Sumber kontrak: PRD-Backend-RigCraft.md.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000/api/v1" },
+    { "key": "token", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "orderId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Adel Test\",\n  \"email\": \"adel_test@example.com\",\n  \"password\": \"password123\"\n}" }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"adel@example.com\",\n  \"password\": \"password123\"\n}" }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/logout",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List + filter + pagination",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/products?search=rtx&category=GPU&brand=NVIDIA&min_price=1000000&max_price=20000000&socket=AM5&ramType=DDR5&sort=lowest&page=1&per_page=12"
+          }
+        },
+        {
+          "name": "Detail",
+          "request": { "method": "GET", "url": "{{baseUrl}}/products/{{productId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Builder",
+      "item": [
+        {
+          "name": "Validate (PRD shape)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/builder/validate",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"processor\": \"<CPU_ID>\",\n  \"motherboard\": \"<MOBO_ID>\",\n  \"ram\": \"<RAM_ID>\",\n  \"gpu\": \"<GPU_ID>\",\n  \"psu\": \"<PSU_ID>\"\n}" }
+          }
+        },
+        {
+          "name": "Validate (legacy shape)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/builder/validate",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"components\": { \"cpu\": \"<CPU_ID>\", \"motherboard\": \"<MOBO_ID>\" }\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Voucher + Cart + Orders",
+      "item": [
+        {
+          "name": "Validate voucher",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/vouchers/validate",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"code\": \"RIGCRAFT2026\",\n  \"subtotal\": 15000000\n}" }
+          }
+        },
+        {
+          "name": "Get cart",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/cart",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Add to cart",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/cart",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1\n}" }
+          }
+        },
+        {
+          "name": "Update cart item qty",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/cart/{{productId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"quantity\": 2\n}" }
+          }
+        },
+        {
+          "name": "Checkout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/orders",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"items\": [{ \"productId\": \"{{productId}}\", \"quantity\": 1 }],\n  \"shippingDetails\": { \"courier\": \"JNE Regular\", \"address\": \"Jl. Mawar No 12, Jakarta\" },\n  \"paymentMethod\": \"Transfer Bank\",\n  \"voucherCode\": \"RIGCRAFT2026\"\n}" }
+          }
+        },
+        {
+          "name": "My orders",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/orders",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Cancel my order",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/orders/{{orderId}}/cancel",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "List (public, ?productId=)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reviews?productId={{productId}}" }
+        },
+        {
+          "name": "Submit (auth)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/reviews",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"rating\": 5,\n  \"comment\": \"Rakit PC rapi banget!\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/stats",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "List products",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/products",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Create product",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/admin/products",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"AMD Ryzen 7 7800X3D\",\n  \"type\": \"sparepart\",\n  \"category\": \"CPU\",\n  \"brand\": \"AMD\",\n  \"price\": 6499000,\n  \"stock\": 20,\n  \"status\": \"Aktif\",\n  \"specs\": { \"socket\": \"AM5\", \"powerWattage\": 120 }\n}" }
+          }
+        },
+        {
+          "name": "Update product",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/admin/products/{{productId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"price\": 6399000,\n  \"stock\": 25\n}" }
+          }
+        },
+        {
+          "name": "List orders (?status=)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/orders?status=Diproses",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Update order status",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/admin/orders/{{orderId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Dikirim\"\n}" }
+          }
+        },
+        {
+          "name": "List vouchers",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/vouchers",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Create voucher",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/admin/vouchers",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"code\": \"HEMAT20\",\n  \"discountPercentage\": 20,\n  \"minPurchase\": 5000000,\n  \"isActive\": true\n}" }
+          }
+        },
+        {
+          "name": "List reviews",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/reviews",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    }
+  ]
+}

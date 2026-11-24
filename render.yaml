@@ -1,0 +1,31 @@
+# RigCraft API — Render blueprint (Docker).
+# Cara pakai: push repo ini ke GitHub, lalu di Render pilih "New +" -> "Blueprint"
+# dan arahkan ke file render.yaml ini. Isi env rahasia di dashboard Render.
+services:
+  - type: web
+    name: rigcraft-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - key: APP_NAME
+        value: RigCraft API
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://rigcraft-api.onrender.com
+      - key: DB_CONNECTION
+        value: mongodb
+      - key: DB_DATABASE
+        value: rigcraft
+      - key: MONGODB_URI
+        sync: false # isi dengan MongoDB Atlas connection string
+      - key: APP_KEY
+        sync: false # generate via: php artisan key:generate --show
+      - key: JWT_SECRET
+        sync: false # generate via: php artisan jwt:secret --show
+      - key: JWT_ALGO
+        value: HS256
