@@ -29,3 +29,5 @@ services:
         sync: false # generate via: php artisan jwt:secret --show
       - key: JWT_ALGO
         value: HS256
+      - key: LOG_CHANNEL
+        value: stderr

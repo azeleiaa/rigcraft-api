@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
 
-// Health check untuk Render/Railway (jangan dihapus)
-Route::get('/up', function () {
-    return response()->json(['status' => 'ok', 'app' => config('app.name')]);
-});
+// NOTE: health check /up disediakan framework via bootstrap/app.php
+// (withRouting health: '/up') — jangan definisikan ulang di sini
+// agar tidak duplikat dan bebas middleware web.
