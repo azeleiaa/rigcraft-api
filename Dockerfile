@@ -1,5 +1,7 @@
-# RigCraft API — production image (PHP 8.3 + Apache + MongoDB extension)
-FROM php:8.3-apache
+# RigCraft API — production image (PHP 8.4 + Apache + MongoDB extension)
+# NOTE: PHP 8.4 karena composer.lock mengunci symfony v8.1 (butuh php >=8.4.1).
+# Jangan turunkan ke 8.3 tanpa regenerate lock dengan platform php 8.3.
+FROM php:8.4-apache
 
 # System deps + PHP extensions needed by Laravel + mongodb driver
 RUN apt-get update && apt-get install -y --no-install-recommends \
