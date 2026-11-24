@@ -3,12 +3,15 @@
 # Jangan turunkan ke 8.3 tanpa regenerate lock dengan platform php 8.3.
 FROM php:8.4-apache
 
-# System deps + PHP extensions needed by Laravel + mongodb driver
+# System deps + PHP extensions.
+# mongodb dipasang via binary prebuilt (mlocati installer, hitungan detik),
+# BUKAN via `pecl install` yang compile dari source (~2-4 menit) dan
+# membuat build selalu melewati batas timeout deploy Render.
+COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip libzip-dev libpng-dev libonig-dev libxml2-dev \
   && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath \
-  && pecl install mongodb \
-  && docker-php-ext-enable mongodb \
+  && install-php-extensions mongodb \
   && a2enmod rewrite \
   && sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf \
   && rm -rf /var/lib/apt/lists/*
