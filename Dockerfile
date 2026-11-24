@@ -44,10 +44,12 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
   && chown -R www-data:www-data storage bootstrap/cache \
   && chmod -R 775 storage bootstrap/cache
 
-EXPOSE 80
+EXPOSE 10000
 
 # Cache config/routes/views, ensure storage link, then serve.
 # NOTE: set APP_KEY, MONGODB_URI, JWT_SECRET via platform env vars.
 # Seeding/indexes are NOT run automatically — run once via:
 #   php artisan db:seed --force && php artisan mongo:indexes
-CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan view:cache; apache2-foreground"]
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+CMD ["docker-entrypoint.sh"]
